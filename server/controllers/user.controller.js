@@ -35,19 +35,55 @@ export const deleteUser= asyncHandler( async(req, res,next)=>{
     }
 })
 
-export const getUser= (req, res,next)=>{
-    
-}
-export const subscribe= (req, res,next)=>{
-    
-}
-export const unsubscribe= (req, res,next)=>{
-    
-}
-export const like= (req, res,next)=>{
-    
-}
-export const dislike= (req, res,next)=>{
-    
-}
+export const getUser= asyncHandler(async(req,res,next)=>{
+    try {
+        const user = await User.findById(req.params.id)
+        res.status(200).json(user)
+    } catch (error) {
+        next(err)
+    }
+})
+export const subscribe= asyncHandler(async(req,res,next)=>{
+    try {
+        await User.findByIdAndUpdate(req.user.id,{
+            $push:{subscribedUsers: req.params.id} 
+        })
+        await User.findByIdAndUpdate(req.params.id,{
+            $inc:{subscribers:1}
+        });
+        res.status(200).json("Subscription successful")
+    } catch (error) {
+        next(error)
+    }
 
+})
+export const unsubscribe= asyncHandler(async(req,res,next)=>{
+    try {
+        await User.findByIdAndUpdate(req.user.id,{
+            $pull:{subscribedUsers: req.params.id} 
+        })
+        await User.findByIdAndUpdate(req.params.id,{
+            $inc:{subscribers:-1}
+        });
+        res.status(200).json("Unsubscription successful")
+    } catch (error) {
+        next(error)
+    }
+
+})
+export const like= asyncHandler(async(req,res,next)=>{
+    try {
+        
+    } catch (error) {
+        
+    }
+
+})
+export const dislike= asyncHandler(async(req,res,next)=>{
+    try {
+        
+    } catch (error) {
+        
+    }
+
+})
