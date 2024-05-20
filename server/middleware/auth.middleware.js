@@ -3,7 +3,6 @@ import { asyncHandler } from "../utils/AsyncHandler.js"
 import jwt from "jsonwebtoken"
 import User  from "../models/User.model.js"
 
-
 export const verifyJWT= asyncHandler(async(req,_,next)=>{
     try {
             const cookies = req.headers.cookie.split(';');

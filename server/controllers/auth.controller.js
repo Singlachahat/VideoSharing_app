@@ -5,7 +5,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import jwt from "jsonwebtoken"
 
-
 const generateAccessAndRefreshTokens= async(userId)=>{
     try {
         const user= await User.findById(userId)

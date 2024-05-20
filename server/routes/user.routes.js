@@ -22,7 +22,7 @@ router.put("/unsub/:id",verifyJWT,unsubscribe)
 //like a video
 router.put("/like/:videoId",verifyJWT,like)
 
-//unlike a video
+//dislike a video
 router.put("/dislike/:videoId",verifyJWT,dislike)
 
 

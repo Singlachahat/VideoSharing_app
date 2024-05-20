@@ -1,4 +1,5 @@
 import User from "../models/User.model.js"
+import Video from "../models/Video.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { asyncHandler } from "../utils/AsyncHandler.js"
 
@@ -18,20 +19,20 @@ export const update= asyncHandler( async(req, res,next)=>{
         }
     }
     else {
-        return next( new ApiError(403, "You can only update your accout"))
+        return next(new ApiError(403, "You can only update your accout"))
     }
 })
 export const deleteUser= asyncHandler( async(req, res,next)=>{
     if(req.params.id=== req.user.id){
         try {
             const updatedUser= await User.findByIdAndDelete(req.params.id)
-            res.status(200).json("user has been deleted")
+            res.status(200).json("User has been deleted")
         } catch (error) {
             next(error)   
         }
     }
     else {
-        return next( new ApiError(403, "You can delete only your accout"))
+        return next(new ApiError(403, "You can delete only your accout"))
     }
 })
 
@@ -55,8 +56,8 @@ export const subscribe= asyncHandler(async(req,res,next)=>{
     } catch (error) {
         next(error)
     }
-
 })
+
 export const unsubscribe= asyncHandler(async(req,res,next)=>{
     try {
         await User.findByIdAndUpdate(req.user.id,{
@@ -72,18 +73,30 @@ export const unsubscribe= asyncHandler(async(req,res,next)=>{
 
 })
 export const like= asyncHandler(async(req,res,next)=>{
-    try {
-        
-    } catch (error) {
-        
-    }
+        const id= req.user.id 
+        const videoId= req.params.videoId
+        try {
+            await Video.findByIdAndUpdate(videoId,{
+                $addToSet:{likes:id},
+                $pull: {dislikes:id}
+            })
+            res.status(200).json("The video has been liked.")
 
-})
+        } catch (error) {
+            next(error)
+        }
+    } )
 export const dislike= asyncHandler(async(req,res,next)=>{
-    try {
-        
-    } catch (error) {
-        
-    }
-
-})
+        const id= req.user.id 
+        const videoId= req.params.videoId
+        try {
+            await Video.findByIdAndUpdate(videoId,{
+                $addToSet:{dislikes:id},
+                $pull: {likes:id}
+            })
+            res.status(200).json("The video has been disliked.")
+        } catch (error) {
+            next(error)
+        }
+    } 
+)

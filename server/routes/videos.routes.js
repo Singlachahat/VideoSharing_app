@@ -7,6 +7,7 @@ const router= express.Router()
 
 //create a video
 router.post("/", verifyJWT,addVideo )
+
 router.put("/:id", verifyJWT,updateVideo )
 router.delete("/:id", verifyJWT,deleteVideo )
 router.get("/find/:id", getVideo )
@@ -16,7 +17,5 @@ router.get("/random", random )
 router.get("/sub",verifyJWT, sub)
 router.get("/tags", getByTag)
 router.get("/search", search)
-
-
 
 export default router

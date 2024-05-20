@@ -7,7 +7,6 @@ import videoRoutes from "./server/routes/videos.routes.js"
 import authRoutes from "./server/routes/auth.routes.js"
 import cookieParser from "cookie-parser"
 
-
 const app= express()
 dotenv.config()
 
@@ -21,6 +20,7 @@ const connect=  ()=>{
         throw err;
     })
 };
+
 app.use(express.json())
 app.use("/api/auth.routes", authRoutes)
 app.use("/api/user.routes", userRoutes)

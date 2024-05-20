@@ -1,5 +1,5 @@
 import { asyncHandler } from "../utils/AsyncHandler.js";
-import Video  from "../models/Video.model.js"
+import Video  from "../models/Video.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import User from "../models/User.model.js"
@@ -48,7 +48,7 @@ export const deleteVideo = asyncHandler(async(req,res,next)=>{
             return next(new ApiError(404, "Video not found"))
         }
         if(req.user.id=== video.userId){
-            await Video.findByIdAndDelete( req.params.id, );
+            await Video.findByIdAndDelete(req.params.id);
             res.status(200)
             .json("the video has been deleted")
         }
@@ -125,7 +125,6 @@ export const sub = asyncHandler(async(req,res,next)=>{
 
 export const getByTag = asyncHandler(async(req,res,next)=>{
     const tags= req.query.tags.split(",")
-    //console.log(tags)
     try {
         const videos= await Video.find({tags: {$in: tags}}).limit(20)
         res.status(200).json(new ApiResponse(videos))
@@ -140,7 +139,7 @@ export const search = asyncHandler(async(req,res,next)=>{
     try {
         const videos= await Video.find({title:{
             $regex: query, $options:"i"
-        }}).limit(20)
+        }}).limit(40)
         res.status(200).json(new ApiResponse(videos))
     } catch (error) {
         next(error)
