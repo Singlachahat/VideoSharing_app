@@ -82,10 +82,12 @@ const Menu = ({darkMode, setDarkMode}) => {
   return (
     <Container>
       <Wrapper>
+      <Link to="/" style={{textDecoration:"none", color:"inherit"}}>
         <Logo>
           <Img src={VideoTube} />
           VideoTube
         </Logo>
+    </Link>
         <Item>
             <HomeIcon/>
             Home
@@ -109,7 +111,7 @@ const Menu = ({darkMode, setDarkMode}) => {
         </Item>
         <Hr/>
         <Login>
-            Sign in to like ,comment and subscribe
+            Sign in to like ,comment and subscribe    
             <Button>
               <AccountCircleOutlinedIcon />
               SIGN IN

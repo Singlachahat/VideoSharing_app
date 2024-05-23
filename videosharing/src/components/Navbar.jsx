@@ -60,7 +60,7 @@ const Navbar = () => {
         <Search>
           <Input placeholder="Search" />
           <SearchOutlinedIcon />
-        </Search>
+        </Search>  
           <Button>
             <AccountCircleOutlinedIcon />
             SIGN IN
