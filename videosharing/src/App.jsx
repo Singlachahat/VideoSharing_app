@@ -7,10 +7,7 @@ import { BrowserRouter ,Routes, Route } from "react-router-dom";
 
 import Video from "./pages/Video";
 import Home from "./pages/Home.jsx";
-
-
-
-
+import SignIn from "./pages/SignIn.jsx";
 
 const Container= styled.div`
 display:flex;
@@ -36,15 +33,15 @@ const [darkMode, setDarkMode]= useState(true);
       <Main>
         <Navbar/>
         <Wrapper> 
-          <Routes>
-           <Route path="/">
-            <Route index element={<Home/>} /> 
-
-            <Route path="video">
-              <Route path=":id" element={<Video/>}/>
-            </Route>
-           </Route>
-          </Routes>
+        <Routes>
+                <Route path="/">
+                  <Route index element={<Home />} />
+                  <Route path="signin" element={<SignIn />} />
+                  <Route path="video">
+                    <Route path=":id" element={<Video />} />
+                  </Route>
+                </Route>
+           </Routes>
         </Wrapper>
       </Main>
       </BrowserRouter>
