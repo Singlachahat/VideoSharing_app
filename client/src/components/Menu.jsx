@@ -51,7 +51,6 @@ const Item = styled.div`
     background-color: ${({ theme }) => theme.soft};
   }
 `;
-
 const Hr = styled.hr`
   margin: 15px 0px;
   border: 0.5px solid ${({ theme }) => theme.soft};
@@ -79,6 +78,7 @@ const Title = styled.h2`
 `;
 
 const Menu = ({darkMode, setDarkMode}) => {
+
   return (
     <Container>
       <Wrapper>
@@ -92,14 +92,18 @@ const Menu = ({darkMode, setDarkMode}) => {
             <HomeIcon/>
             Home
         </Item>
-        <Item>
-          <ExploreOutlinedIcon />
-          Explore
-        </Item>
+        <Link to="trends" style={{textDecoration:"none",color: "inherit" }}>
+          <Item>
+            <ExploreOutlinedIcon />
+            Explore
+          </Item>
+        </Link>
+        <Link to="subscriptions" style={{textDecoration:"none",color: "inherit" }}>
         <Item>
           <SubscriptionsOutlinedIcon />
           Subscriptions
         </Item>
+        </Link>
         <Hr/>
         <Item>
           <VideoLibraryOutlinedIcon />
@@ -112,7 +116,7 @@ const Menu = ({darkMode, setDarkMode}) => {
         <Hr/>
         <Login>
             Sign in to like ,comment and subscribe  
-              <Link to="signin" style={{textDecoration:"none"}}>
+              <Link to="signin" style={{textDecoration:"none",color: "inherit" }}>
             <Button>
               <AccountCircleOutlinedIcon />
               SIGN IN

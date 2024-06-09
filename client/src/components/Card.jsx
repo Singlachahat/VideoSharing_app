@@ -1,6 +1,8 @@
- import React from 'react'
+ import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
  import styled from "styled-components";
+ import { format } from 'timeago.js';
 
   const Container = styled.div`
   width: ${(props) => props.type !== "sm" && "360px"};
@@ -52,17 +54,29 @@ const Info = styled.div`
 `; 
 
 
-const Card = ({type}) => {
+const Card = ({type,video}) => {
+  const [channel,setChannel]= useState({})
+
+  useEffect(()=>{
+    const fetchChannel= async()=>{
+        const res=await axios.get((`http://localhost:8800/api/user.routes/find/${video.userId}`)) 
+        console.log("API response channel",res.data)
+        setChannel(res.data)
+        console.log(channel)
+    }
+    fetchChannel()
+  },[video]);
+
   return (
     <Link to="/video/test" style={{textDecoration:"none"}}>
     <Container type={type}>
-        <Image type={type} src="https://images.pexels.com/photos/23881778/pexels-photo-23881778/free-photo-of-on-a-cloudy-day-at-the-lakefront-of-keswick-england.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"/>
+        <Image type={type} src={video.imgUrl}/>
         <Details type={type}>
-            <ChannelImage type={type} src="https://images.pexels.com/photos/23887232/pexels-photo-23887232/free-photo-of-entertainment.jpeg"/>
+             {/* <ChannelImage type={type} src={channel.img}/>  */}
             <Texts>
-                <Title> Test video </Title>
-                <ChannelName> Test channel</ChannelName>
-                <Info> 10000 views , 1 day ago</Info>
+                <Title>{video.title}</Title>
+                <ChannelName>{channel.name} </ChannelName>
+                <Info> {video.views} views, {format(video.createdAt)}</Info>
             </Texts>
         </Details>
     </Container>
