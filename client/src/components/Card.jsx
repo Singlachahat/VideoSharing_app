@@ -57,22 +57,32 @@ const Info = styled.div`
 const Card = ({type,video}) => {
   const [channel,setChannel]= useState({})
 
-  useEffect(()=>{
-    const fetchChannel= async()=>{
-        const res=await axios.get((`http://localhost:8800/api/user.routes/find/${video.userId}`)) 
-        console.log("API response channel",res.data)
-        setChannel(res.data)
+  useEffect(() => {
+    const fetchChannel = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8800/api/user.routes/find/${video.userId}`);
+        console.log("API response channel", res.data);
+        if(res.data){
+        setChannel(res.data);
+        }
         console.log(channel)
+      } catch (error) {
+        console.error("Error fetching channel:", error);
+      }
+    };
+
+    if (video && video.userId) {
+      fetchChannel();
+      console.log("channel",channel)
     }
-    fetchChannel()
-  },[video]);
+  }, [video.userId]);
 
   return (
     <Link to="/video/test" style={{textDecoration:"none"}}>
     <Container type={type}>
         <Image type={type} src={video.imgUrl}/>
         <Details type={type}>
-             {/* <ChannelImage type={type} src={channel.img}/>  */}
+             <ChannelImage type={type} src={channel.img}/> 
             <Texts>
                 <Title>{video.title}</Title>
                 <ChannelName>{channel.name} </ChannelName>

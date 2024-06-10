@@ -3,7 +3,6 @@ import { signup } from "../controllers/auth.controller.js"
 import {signin} from "../controllers/auth.controller.js"
 const router= express.Router()
 
-
 //create a user
 router.post("/signup", signup)
 
