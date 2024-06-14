@@ -3,7 +3,7 @@ import User from "../models/User.model.js"
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
-import jwt from "jsonwebtoken"
+
 
 const generateAccessAndRefreshTokens= async(userId)=>{
     try {
@@ -59,7 +59,7 @@ const signin= asyncHandler(async(req,res)=>{
     const {name, email,password}= req.body
 
     if(!(name && password)){
-        throw new ApiError(400, "Username and email is required")
+        throw new ApiError(400, "Username and password is required")
     }
 
     const user= await User.findOne({
@@ -83,7 +83,6 @@ const signin= asyncHandler(async(req,res)=>{
 
     const options= {
         httpOnly:true,
-        secure:true
     }
 
     return res.status(200)
@@ -99,5 +98,34 @@ const signin= asyncHandler(async(req,res)=>{
         )
     )
 })
-
-export {signup, signin,generateAccessAndRefreshTokens}
+const googleAuth= async(req,res,next)=>{
+     try {
+        const user=User.findOne({email:req.body.email})
+        if(user){
+            const {accessToken, refreshToken}= await generateAccessAndRefreshTokens(user._id)
+            res
+            .cookie("access_token", accessToken, {
+              httpOnly: true,
+            })
+            .status(200)
+            .json(user._doc);
+        }
+        else{
+            const newUser= new User({
+                ...req.body, 
+                fromGoogle:true,
+            });
+            const savedUser = await newUser.save();
+            const {accessToken, refreshToken}= await generateAccessAndRefreshTokens(savedUser._id)
+            res
+            .cookie("access_token", accessToken, {
+            httpOnly: true,
+            })
+            .status(200)
+            .json(savedUser._doc);
+            }
+     } catch (error) {
+        next(error)
+     }
+}
+export {signup, signin,generateAccessAndRefreshTokens,googleAuth}
