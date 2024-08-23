@@ -5,6 +5,8 @@ import { useDispatch } from 'react-redux';
 import { loginFailure, loginStart, loginSuccess } from '../redux/userSlice';
 import { auth,provider } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
+import {async} from "@firebase/util"
+import { useNavigate } from 'react-router-dom';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -19,7 +21,7 @@ const Wrapper = styled.div`
   align-items: center;
   flex-direction: column;
   background-color: ${({ theme }) => theme.bgLighter};
-  border: 1px solid ${({ theme }) => theme.soft};
+  border: 1px  solid ${({ theme }) => theme.soft};
   padding: 20px 50px;
   gap: 10px;
 `;
@@ -73,13 +75,14 @@ const SignIn = () => {
   const [password, setpassword]= useState("")
 
   const dispatch= useDispatch()
-
+  const navigate= useNavigate()
   const handleLogin = async(e)=>{
     e.preventDefault();
     dispatch(loginStart())
     try {
-      const res= await axios.post("http://localhost:8800/api/auth.routes/signin",{name,email,password})
+      const res= await axios.post("http://localhost:8800/api/auth.routes/signin",{name,email,password},{withCredentials: true})
       dispatch(loginSuccess(res.data))
+      navigate("/")
       console.log("data" ,res.data)
     } catch (err) {
       dispatch(loginFailure())
@@ -87,20 +90,20 @@ const SignIn = () => {
   }
 
   const signInWithGoogle=async()=>{
-    dispatch(loginStart());
-    signInWithPopup(auth,provider).then((result)=>{
-      axios.post("http://localhost:8800/api/auth.routes/google",{
-        name:result.user.displayName,
-        email: result.user.email,
-        img: result.user.photoURL
-      }).then((res)=>{
-        dispatch(loginSuccess(res.data))
-      })
-    })
-    .catch((error)=>{
-      dispatch(loginFailure());
-    })
-  }
+    dispatch(loginStart())
+      signInWithPopup(auth,provider).then((result)=>{
+        axios.post("http://localhost:8800/api/auth.routes/google",{
+         name: result.user.displayName,
+         email: result.user.email,
+         img: result.user.photoURL,
+       },{withCredentials: true}).then((res)=>{
+         dispatch(loginSuccess(res.data))
+         navigate("/")
+       });
+     }).catch((error)=>{
+      dispatch(loginFailure())
+    });
+  };
   return (
     <Container>
       <Wrapper>

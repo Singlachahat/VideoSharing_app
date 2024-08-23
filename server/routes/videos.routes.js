@@ -6,8 +6,7 @@ import { verifyJWT } from "../middleware/auth.middleware.js"
 const router= express.Router()
 
 //create a video
-router.post("/", verifyJWT,addVideo )
-
+router.post("/", verifyJWT,addVideo)
 router.put("/:id", verifyJWT,updateVideo )
 router.delete("/:id", verifyJWT,deleteVideo )
 router.get("/find/:id", getVideo )

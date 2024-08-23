@@ -97,7 +97,7 @@ export const trend = asyncHandler(async(req,res,next)=>{
     try {
         const videos= await Video.find().sort(
             {
-                views:-1
+                views:-1 
             }
         )
         res.status(200).json(new ApiResponse(videos))
@@ -132,7 +132,7 @@ export const getByTag = asyncHandler(async(req,res,next)=>{
         next(error)
     }
 })
-
+ 
 export const search = asyncHandler(async(req,res,next)=>{
     const query= req.query.q
     //console.log(tags)

@@ -83,6 +83,8 @@ const signin= asyncHandler(async(req,res)=>{
 
     const options= {
         httpOnly:true,
+        secure:false,
+        SameSite : 'None',
     }
 
     return res.status(200)
@@ -100,7 +102,7 @@ const signin= asyncHandler(async(req,res)=>{
 })
 const googleAuth= async(req,res,next)=>{
      try {
-        const user=User.findOne({email:req.body.email})
+        const user=await User.findOne({email:req.body.email})
         if(user){
             const {accessToken, refreshToken}= await generateAccessAndRefreshTokens(user._id)
             res
@@ -110,7 +112,7 @@ const googleAuth= async(req,res,next)=>{
             .status(200)
             .json(user._doc);
         }
-        else{
+        else{    
             const newUser= new User({
                 ...req.body, 
                 fromGoogle:true,

@@ -1,11 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import ThumbDownOffAltOutlinedIcon from "@mui/icons-material/ThumbDownOffAltOutlined";
 import ReplyOutlinedIcon from "@mui/icons-material/ReplyOutlined";
 import AddTaskOutlinedIcon from "@mui/icons-material/AddTaskOutlined";
+import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import Comments from "../components/Comments";
 import Card from "../components/Card";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
+import {
+  fetchSuccess,
+  fetchStart,
+  fetchFailure,
+  dislike,
+  like,
+} from "../redux/videoSlice";
+import moment from "moment/moment";
 
 const Container = styled.div`
   display: flex;
@@ -52,7 +65,6 @@ const Hr = styled.hr`
   border: 0.5px solid ${({ theme }) => theme.soft};
 `;
 
-
 const Recommendation = styled.div`
   flex: 2;
 `;
@@ -78,7 +90,6 @@ const ChannelDetail = styled.div`
   flex-direction: column;
   color: ${({ theme }) => theme.text};
 `;
-
 
 const ChannelName = styled.span`
   font-weight: 500;
@@ -106,70 +117,178 @@ const Subscribe = styled.button`
   cursor: pointer;
 `;
 
+const VideoFrame = styled.video`
+  max-height: 720px;
+  width: 100%;
+  object-fit: cover;
+`;
 
 const Video = () => {
+  const { currentUser } = useSelector((state) => state.user);
+  console.log(currentUser);
+  const { currentVideo } = useSelector((state) => state.video);
+  //console.log("current video is" ,currentVideo)
+  console.log("current video is", currentVideo);
+  const dispatch = useDispatch();
+  const path = useLocation().pathname.split("/")[2];
+  console.log(path);
+  const [channel, setChannel] = useState({});
+  const timeago = moment(currentVideo?.createdAt).fromNow();
+
+  useEffect(() => {
+    dispatch(fetchStart());
+    const fetchData = async () => {
+      try {
+        const videoRes = await axios.get(
+          `http://localhost:8800/api/videos.routes/find/${path}`
+        );
+        console.log("result is", videoRes);
+        const channelRes = await axios.get(
+          `http://localhost:8800/api/user.routes/find/${videoRes.data.userId}`
+        );
+        setChannel(channelRes.data);
+        dispatch(fetchSuccess(videoRes.data));
+      } catch (err) {
+        fetchFailure();
+      }
+    };
+    fetchData();
+  }, [path, dispatch]);
+
+  // const handleLike = async () => {
+  //   await axios.put(
+  //     `http://localhost:8800/api/user.routes/like/${currentVideo?._id}`
+  //   );
+  //   dispatch(like(currentUser?.data?.user._id));
+  // };
+
+  const handleLike = async () => {
+    const accessToken = currentUser?.data?.accessToken;
+
+    if (accessToken) {
+      await axios.put(
+        `http://localhost:8800/api/user.routes/like/${currentVideo?._id}`,
+        {},
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+    } else {
+      console.error("No access token found");
+    }
+    dispatch(like(currentUser?.data?.user._id));
+  };
+
+  const handleDislike = async () => {
+    const accessToken = currentUser?.data?.accessToken;
+
+    if (accessToken) {
+      await axios.put(
+        `http://localhost:8800/api/user.routes/dislike/${currentVideo?._id}`,
+        {},
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+    } else {
+      console.error("No access token found");
+    }
+    dispatch(dislike(currentUser?.data?.user._id));
+  };
+
+  const handleSub = async () => {
+    const accessToken = currentUser?.data?.accessToken;
+
+    if (accessToken) {
+      currentUser?.data.user.subscribedUsers.includes(channel?._id)
+        ? await axios.put(
+            `http://localhost:8800/api/user.routes/unsub/${channel?._id}`,
+            {},
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          )
+        : await axios.put(
+            `http://localhost:8800/api/user.routes/sub/${channel?._id}`,
+            {},
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          );
+    } else {
+      console.error("No access token found");
+    }
+    dispatch(subscription(channel._id));
+  };
+
+  //TODO: DELETE VIDEO FUNCTIONALITY
+
   return (
     <Container>
       <Content>
         <VideoWrapper>
-          <iframe
-            width="100%"
-            height="500"
-            src="https://www.youtube.com/embed/k3Vfj-e1Ma4"
-            title="YouTube video player"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          ></iframe>
+          <VideoFrame src="https://www.youtube.com/embed/k3Vfj-e1Ma4" />
         </VideoWrapper>
-        <Title> Test video</Title>
+        {currentVideo === null ? (
+          <h1>Loading</h1>
+        ) : (
+          <Title>{currentVideo?.title}</Title>
+        )}
         <Details>
-          <Info>100000 views ~ May 23,2024</Info>
+          <Info>
+            {currentVideo?.views} views • {timeago}
+          </Info>
           <Buttons>
-            <Button>
-              <ThumbUpOutlinedIcon /> 123
+            <Button onClick={handleLike}>
+              {currentVideo?.likes?.includes(currentUser?._id) ? (
+                <ThumbUpIcon />
+              ) : (
+                <ThumbUpOutlinedIcon />
+              )}
+              {currentVideo?.likes?.length}
+            </Button>
+            <Button onClick={handleDislike}>
+              {currentVideo?.dislikes?.includes(currentUser?._id) ? (
+                <ThumbDownIcon />
+              ) : (
+                <ThumbDownOffAltOutlinedIcon />
+              )}
+              Dislike
             </Button>
             <Button>
-              <ThumbDownOffAltOutlinedIcon /> Dislike
+              <ReplyOutlinedIcon />
+              Share
             </Button>
             <Button>
-              <ReplyOutlinedIcon /> Share
-            </Button>
-            <Button>
-              <AddTaskOutlinedIcon /> Save
+              <AddTaskOutlinedIcon />
+              Save
             </Button>
           </Buttons>
         </Details>
-        <Hr/>
+        <Hr />
         <Channel>
-            <ChannelInfo>
-                <Image src="https://images.pexels.com/photos/23887232/pexels-photo-23887232/free-photo-of-entertainment.jpeg"></Image>
-                <ChannelDetail>
-                    <ChannelName>Test Channel</ChannelName>
-                    <ChannelCounter>100k subscribers</ChannelCounter>
-                    <Description>This is a test channel description.</Description>
-                </ChannelDetail>
-            </ChannelInfo>
-            <Subscribe> SUBSCRIBE </Subscribe>
+          <ChannelInfo>
+            <Image src={channel.img} />
+            <ChannelDetail>
+              <ChannelName>{channel.name}</ChannelName>
+              <ChannelCounter>{channel.subscribers} subscribers</ChannelCounter>
+              {currentVideo === null ? (
+                <h1>Loading</h1>
+              ) : (
+                <Description>{currentVideo.desc}</Description>
+              )}
+            </ChannelDetail>
+          </ChannelInfo>
+          <Subscribe onClick={handleSub}>
+            {currentUser.subscribedUsers?.includes(channel._id)
+              ? "SUBSCRIBED"
+              : "SUBSCRIBE"}
+          </Subscribe>
         </Channel>
-        <Hr/>
-        <Comments/>
+        <Hr />
+        {currentVideo === null ? (
+          <h1>Loading</h1>
+        ) : (
+          <Comments videoId={currentVideo._id} />
+        )}
       </Content>
-      <Recommendation>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-      </Recommendation>
+      {currentVideo === null ? (
+        <h1>Loading</h1>
+      ) : (
+        <Recommendation tags={currentVideo.tags} />
+      )}
     </Container>
   );
 };
