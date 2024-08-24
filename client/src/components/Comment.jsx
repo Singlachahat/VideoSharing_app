@@ -1,4 +1,6 @@
-import React from "react";
+import axios from "axios";
+import moment from "moment";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -35,20 +37,35 @@ const Text = styled.span`
   font-size: 14px;
 `;
 
-const Comment = () => {
+const Comment = ({ comment }) => {
+  const [channel, setChannel] = useState({});
+  const timeago = moment(comment.createdAt).fromNow();
+
+  useEffect(() => {
+    const fetchComment = async () => {
+      const res = await axios.get(`http://localhost:8800/api/user.routes/find/${comment.userId}`);
+      setChannel(res.data);
+    };
+    fetchComment();
+  }, [comment.userId]);
+
   return (
     <Container>
-      <Avatar src="https://images.pexels.com/photos/23887232/pexels-photo-23887232/free-photo-of-entertainment.jpeg" />
+      <Avatar
+        src={
+          channel?.img ||
+          "https://herrmans.eu/wp-content/uploads/2019/01/765-default-avatar.png"
+        }
+      />
       <Details>
         <Name>
-          John Doe <Date>1 day ago</Date>
+          {channel?.name}
+          <Date>{timeago}</Date>
         </Name>
-        <Text>
-          This is a test Comment
-        </Text>
+        <Text>{comment.desc}</Text>
       </Details>
     </Container>
-  );
+  ); 
 };
 
 export default Comment;

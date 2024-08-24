@@ -7,16 +7,21 @@ import AddTaskOutlinedIcon from "@mui/icons-material/AddTaskOutlined";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import Comments from "../components/Comments";
+import Recommendation from "../components/Recommendation.jsx";
 import Card from "../components/Card";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import {
+  subscription
+} from "../redux/userSlice.js"
 import {
   fetchSuccess,
   fetchStart,
   fetchFailure,
   dislike,
   like,
+  
 } from "../redux/videoSlice";
 import moment from "moment/moment";
 
@@ -63,10 +68,6 @@ const Button = styled.div`
 const Hr = styled.hr`
   margin: 15px 0px;
   border: 0.5px solid ${({ theme }) => theme.soft};
-`;
-
-const Recommendation = styled.div`
-  flex: 2;
 `;
 
 const Channel = styled.div`
@@ -219,7 +220,7 @@ const Video = () => {
     <Container>
       <Content>
         <VideoWrapper>
-          <VideoFrame src="https://www.youtube.com/embed/k3Vfj-e1Ma4" />
+         <VideoFrame src={currentVideo?.videoUrl} controls />
         </VideoWrapper>
         {currentVideo === null ? (
           <h1>Loading</h1>
@@ -272,7 +273,7 @@ const Video = () => {
             </ChannelDetail>
           </ChannelInfo>
           <Subscribe onClick={handleSub}>
-            {currentUser.subscribedUsers?.includes(channel._id)
+            {currentUser.data.user.subscribedUsers?.includes(channel._id)
               ? "SUBSCRIBED"
               : "SUBSCRIBE"}
           </Subscribe>
@@ -287,7 +288,7 @@ const Video = () => {
       {currentVideo === null ? (
         <h1>Loading</h1>
       ) : (
-        <Recommendation tags={currentVideo.tags} />
+        <Recommendation tags={currentVideo?.tags} />
       )}
     </Container>
   );
